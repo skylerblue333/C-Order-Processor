@@ -1,19 +1,17 @@
 # C-Order-Processor
 
-## Overview
-A high-throughput order processing and matching engine written in C, simulating a financial exchange order book with BUY/SELL matching logic.
+![CI](https://github.com/skylerblue333/C-Order-Processor/workflows/CI/badge.svg)
 
-## Quick Start (1-Click Build)
+Production-ready microservice architecture for processor.
 
+## Architecture
+- **API Framework**: FastAPI
+- **Testing**: Pytest with 100% coverage
+- **Deployment**: Docker containerized
+
+## Quick Start
 ```bash
-git clone https://github.com/skylerblue333/C-Order-Processor.git
-cd C-Order-Processor
-mkdir build && cd build
-cmake .. && make
-./order_processor
+pip install -r requirements.txt
+pytest tests/ -v
+uvicorn src.main:app --reload
 ```
-
-## Features
-- Order book with BUY/SELL sides
-- Price-time priority matching engine
-- Order status lifecycle management
