@@ -47,7 +47,7 @@ static int quote_order(uint64_t unit_price_cents, uint64_t quantity,
     }
 
     subtotal = unit_price_cents * quantity;
-    if (subtotal > UINT64_MAX / discount_bps && discount_bps != 0) {
+    if (discount_bps != 0 && subtotal > UINT64_MAX / discount_bps) {
         return -1;
     }
     discount = discount_bps == 0 ? 0 : (subtotal * discount_bps) / UINT64_C(10000);
