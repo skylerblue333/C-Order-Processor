@@ -1,36 +1,39 @@
 #include <stdio.h>
-#include <assert.h>
-#include <string.h>
+#include <stdlib.h>
+#include <sys/wait.h>
 
-#define MAX_ITEMS 1024
-
-typedef struct {
-    char key[64];
-    int value;
-} Item;
-
-Item store[MAX_ITEMS];
-int store_size = 0;
-
-int add_item(const char* key, int value) {
-    if (store_size >= MAX_ITEMS) return -1;
-    strncpy(store[store_size].key, key, 63);
-    store[store_size].value = value;
-    store_size++;
-    return store_size - 1;
-}
-
-int find_item(const char* key) {
-    for (int i = 0; i < store_size; i++) {
-        if (strcmp(store[i].key, key) == 0) return store[i].value;
+static int exit_code(const char *command) {
+    const int status = system(command);
+    if (status == -1 || !WIFEXITED(status)) {
+        return -1;
     }
-    return -1;
+    return WEXITSTATUS(status);
 }
 
-int main() {
-    add_item("test_key", 42);
-    assert(find_item("test_key") == 42);
-    assert(find_item("missing") == -1);
-    printf("All tests passed!\n");
+static int expect_exit(const char *command, int expected) {
+    const int actual = exit_code(command);
+    if (actual != expected) {
+        fprintf(stderr, "command failed expectation: %s (expected %d, got %d)\n", command, expected, actual);
+        return 1;
+    }
+    return 0;
+}
+
+int main(void) {
+    int failures = 0;
+    failures += expect_exit("./app 2500 2 >/tmp/order-no-discount.json", 0);
+    failures += expect_exit("grep -q '\"total_cents\":5000' /tmp/order-no-discount.json", 0);
+    failures += expect_exit("./app 2500 2 1000 >/tmp/order-discount.json", 0);
+    failures += expect_exit("grep -q '\"discount_cents\":500' /tmp/order-discount.json", 0);
+    failures += expect_exit("grep -q '\"total_cents\":4500' /tmp/order-discount.json", 0);
+    failures += expect_exit("./app 0 1 >/dev/null 2>&1", 2);
+    failures += expect_exit("./app 100 0 >/dev/null 2>&1", 2);
+    failures += expect_exit("./app 100 1 10001 >/dev/null 2>&1", 2);
+    failures += expect_exit("./app nope 1 >/dev/null 2>&1", 2);
+    failures += expect_exit("./app 100 -1 >/dev/null 2>&1", 2);
+    if (failures != 0) {
+        return 1;
+    }
+    puts("order core contract tests passed");
     return 0;
 }
