@@ -1,44 +1,34 @@
-<!-- PORTFOLIO PROJECT PROFILE: maintained by the repository owner -->
+# Sky Order Core
 
-## Project profile and code-audit snapshot
+**Status: engineering beta.** A deterministic C11 order-total calculation primitive using integer cents and basis points.
 
-**What this is:** **C-Order-Processor** is a public repository described as: “High-throughput order processing engine in C for financial systems. #SkyCoin4444 #AI #Blockchain #DevOps #Innovation” Its dominant language signals are **C (2 files)**.
+## Implemented
 
-**Why it has value:** Its value is best understood through the implementation evidence currently present in the repository: **16 tracked files** were observed in the shallow audit, with the source structure and existing documentation providing the project’s specific context. This README does not treat a prototype, experiment, or archive as a production system without supporting evidence.
+```bash
+./app <unit_price_cents> <quantity> [discount_bps]
+```
 
-**Implementation evidence:** 1 test-related file(s) detected; 1 dependency or package manifest(s) detected; 2 build/CI/infrastructure signal(s) detected; and 3 documentation or governance file(s) detected. Test filenames observed include `tests/test_main.c`. Dependency or package files include `package.json`. Build, CI, or infrastructure signals include `Dockerfile`, `.github/workflows/ci.yml`.
+- Unit price: 1–100,000,000 cents.
+- Quantity: 1–100,000.
+- Discount: 0–10,000 basis points (0–100%).
+- Integer-only subtotal, discount, and total calculation.
+- Explicit multiplication overflow checks.
+- JSON output for quote fields.
+- Strict C11 warnings-as-errors build, contract tests, ASan/UBSan verification, CMake build, and non-root scratch container.
 
-**Current status:** The repository is tracked on the `main` branch. The existing source tree, configuration, tests, workflows, and documentation remain authoritative for supported behavior and maturity. A code audit is not a production-readiness certification, and the presence of a test or workflow file does not establish that all checks pass.
+Example:
 
-**Relationship to the wider portfolio:** This repository is one focused component of the broader Skyler Blue Spillers portfolio across AI, software engineering, cloud and DevOps, cybersecurity, blockchain, finance, education, social systems, and creative work. It may provide a service boundary, implementation pattern, experiment, archive, or reusable idea for related repositories. Treat repositories as technical dependencies only where documented interfaces and verified project requirements support that relationship.
+```bash
+./app 2500 2 1000
+# {"unit_price_cents":2500,"quantity":2,"discount_bps":1000,"subtotal_cents":5000,"discount_cents":500,"total_cents":4500}
+```
 
-**Quality and security note:** No obvious secret-like pattern was detected by the limited static scan; this is not a substitute for a security audit. No TODO/FIXME marker was detected in the scanned text files.
+## Scope limitations
 
----
+This component calculates a local deterministic quote only. It does **not** create or persist orders, authorize or capture payments, calculate jurisdictional tax, manage inventory, shipping, refunds, invoices, discounts from external policy, customer identity, fraud controls, idempotency across requests, HA, or production deployment.
 
-# C Order Processor
+The arithmetic should not be treated as accounting, tax, or payment-system certification.
 
-![GitHub stars](https://img.shields.io/github/stars/skylerblue333/C-Order-Processor?style=flat-square)
-![GitHub license](https://img.shields.io/github/license/skylerblue333/C-Order-Processor?style=flat-square)
+## SKYCOIN4444 integration
 
-## 🌟 Overview
-**C-Order-Processor** is a professional-grade project within the **SkyCoin4444** ecosystem. It focuses on delivering high-value solutions in the domain of **Software Development**.
-
-## 🚀 Key Features
-- **Scalable Architecture**: Designed for enterprise-level growth and performance.
-- **Modern Standards**: Implements best practices for clean code and maintainability.
-- **Robust Integration**: Built to work seamlessly within modern cloud-native environments.
-
-## 🛠️ Technology Stack
-- **Primary Domain**: Software Development
-- **Ecosystem**: SkyCoin4444 Digital Platform
-
-## 📂 Structure
-The project is organized into a modular structure to ensure clarity and ease of development.
-
-## 👨‍💻 Author
-**Skyler Blue Spillers**
-*Professional Chess Player & Software Engineer*
-
----
-*Powered by SkyCoin4444*
+Use the calculation boundary where a small deterministic pre-order total is useful. Authoritative catalog prices, tax, inventory, payment authorization, persistence, and audit records must be provided by separately verified systems.
